@@ -6,7 +6,7 @@ import {
   Scope,
 } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
-import { catchError, finalize, Observable, throwError } from 'rxjs';
+import { finalize, Observable, tap } from 'rxjs';
 import { SentryService } from './sentry.service';
 
 /**
@@ -21,15 +21,13 @@ export class SentryInterceptor implements NestInterceptor {
     const span = this.sentryService.startChild({ op: `route handler` });
 
     return next.handle().pipe(
-      catchError((error) => {
-        // capture the error, you can filter out some errors here
-        Sentry.captureException(
-          error,
-          this.sentryService.span.getTraceContext(),
-        );
-
-        // throw again the error
-        return throwError(() => error);
+      tap({
+        error: (exception) => {
+          Sentry.captureException(
+            exception,
+            this.sentryService.span.getTraceContext(),
+          );
+        },
       }),
       finalize(() => {
         span.finish();
