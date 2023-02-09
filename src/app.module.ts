@@ -1,13 +1,14 @@
-import { RequestMethod } from '@nestjs/common';
-import { MiddlewareConsumer } from '@nestjs/common';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { SentryModule } from './sentry/sentry.module';
 import * as Sentry from '@sentry/node';
+import { SentryModule } from './sentry/sentry.module';
+
 import '@sentry/tracing';
+
+import { ProfilingIntegration } from '@sentry/profiling-node';
 
 @Module({
   imports: [
@@ -16,6 +17,11 @@ import '@sentry/tracing';
       dsn: process.env.SENTRY_DNS,
       tracesSampleRate: 1.0,
       debug: true,
+      profilesSampleRate: 1.0, // Profiling sample rate is relative to tracesSampleRate
+      integrations: [
+        // Add profiling integration to list of integrations
+        new ProfilingIntegration(),
+      ],
     }),
   ],
   controllers: [AppController],
