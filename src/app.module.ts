@@ -15,13 +15,10 @@ import { ProfilingIntegration } from '@sentry/profiling-node';
     ConfigModule.forRoot(),
     SentryModule.forRoot({
       dsn: process.env.SENTRY_DNS,
-      tracesSampleRate: 1.0,
-      debug: true,
-      profilesSampleRate: 1.0, // Profiling sample rate is relative to tracesSampleRate
-      integrations: [
-        // Add profiling integration to list of integrations
-        new ProfilingIntegration(),
-      ],
+      tracesSampleRate: +process.env.SENTRY_TRACES_SAMPLE_RATE ?? 0,
+      debug: process.env.SENTRY_DEBUG === 'true',
+      profilesSampleRate: +process.env.SENTRY_PROFILE_SAMPLE_RATE ?? 0,
+      integrations: [new ProfilingIntegration()],
     }),
   ],
   controllers: [AppController],
