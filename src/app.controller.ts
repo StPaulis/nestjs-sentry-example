@@ -5,17 +5,17 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
+  @Get('api/mobile')
   getHello() {
     return this.appService.getHello();
   }
 
-  @Get('throw')
+  @Get('/throw')
   throwError() {
     throw new HttpException({ message: 'Sample Error' }, 500);
   }
 
-  @Get('lazy')
+  @Get('api/back-office')
   async getLazy() {
     return this.appService.getLazyHello();
   }

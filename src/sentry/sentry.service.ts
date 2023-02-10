@@ -28,14 +28,16 @@ export class SentryService {
     const transaction = Sentry.startTransaction({
       name: `Route: ${method} ${url}`,
       op: 'transaction',
+      data: {
+        headers,
+        method,
+        url,
+      },
     });
 
     // setup context of newly created transaction
     Sentry.getCurrentHub().configureScope((scope) => {
       scope.setSpan(transaction);
-
-      // customize your context here
-      scope.setContext('http', { method, url, headers });
     });
   }
 

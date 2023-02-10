@@ -9,15 +9,17 @@ import { SentryModule } from './sentry/sentry.module';
 import '@sentry/tracing';
 
 import { ProfilingIntegration } from '@sentry/profiling-node';
+import { sampler } from './sentry/sentry.utils';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     SentryModule.forRoot({
       dsn: process.env.SENTRY_DNS,
-      tracesSampleRate: +process.env.SENTRY_TRACES_SAMPLE_RATE ?? 0,
+      enabled: !!process.env.SENTRY_DNS,
       debug: process.env.SENTRY_DEBUG === 'true',
       profilesSampleRate: +process.env.SENTRY_PROFILE_SAMPLE_RATE ?? 0,
+      tracesSampler: ({ transactionContext: { data } }) => sampler(data.url),
       integrations: [new ProfilingIntegration()],
     }),
   ],
